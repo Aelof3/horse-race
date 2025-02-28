@@ -53,6 +53,93 @@ h2 {
   text-align: center;
 }
 
+h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Balance Display */
+.balance-display {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 15px 25px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 2px solid #FFD700;
+}
+
+.balance-display h2, 
+.balance-display h3 {
+  color: #FFD700;
+  margin-bottom: 10px;
+}
+
+.balance-display p, 
+.balance-display span {
+  font-size: 18px;
+  margin: 5px 0;
+  display: block;
+}
+
+.reset-button {
+  background-color: #FF5722;
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+}
+
+.reset-button:hover {
+  background-color: #E64A19;
+}
+
+/* Betting Section */
+.betting-section {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.bet-amounts {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.bet-button {
+  background-color: #2196F3;
+  padding: 10px 20px;
+}
+
+.bet-button:hover {
+  background-color: #0b7dda;
+}
+
+.bet-button.selected {
+  background-color: #0b7dda;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  border: 2px solid white;
+}
+
+.odds-info {
+  text-align: center;
+  font-style: italic;
+  color: #FFD700;
+  margin-top: 10px;
+}
+
+.warning-message {
+  color: #FF5252;
+  font-weight: bold;
+  margin-top: 15px;
+  text-align: center;
+}
+
 /* Menu Screen */
 .menu-screen {
   display: flex;
@@ -153,10 +240,25 @@ h2 {
   height: auto;
 }
 
-.pause-button {
+.game-info {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.game-info .balance-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0;
+}
+
+.pause-button {
   background-color: #FF9800;
 }
 
@@ -222,8 +324,11 @@ h2 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-h3 {
-  font-size: 24px;
-  margin-bottom: 30px;
+.result-message {
   text-align: center;
+  margin-bottom: 30px;
+}
+
+.result-message h3 {
+  margin-bottom: 20px;
 }

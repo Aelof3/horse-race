@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import horseImage from './assets/horse.png'
 import racetrackImage from './assets/racetrack.jpg'
@@ -16,20 +16,43 @@ const HORSE_COLORS = [
   '#33FFF3'  // Cyan
 ];
 
+// Bet amounts
+const BET_AMOUNTS = [10, 50, 100];
+
 function App() {
   const [gameState, setGameState] = useState<GameState>('menu');
   const [selectedHorse, setSelectedHorse] = useState<number | null>(null);
   const [winnerHorse, setWinnerHorse] = useState<number | null>(null);
   const [horses, setHorses] = useState<number[]>([0, 0, 0, 0, 0, 0]); // Position of each horse (0-100%)
   const [raceInterval, setRaceInterval] = useState<number | null>(null);
+  const [balance, setBalance] = useState<number>(100); // Player's coin balance
+  const [betAmount, setBetAmount] = useState<number>(10); // Default bet amount
+  const [winnings, setWinnings] = useState<number | null>(null); // Amount won in the current race
+
+  // Load balance from localStorage on initial render
+  useEffect(() => {
+    const savedBalance = localStorage.getItem('horseRaceBalance');
+    if (savedBalance) {
+      setBalance(parseInt(savedBalance));
+    }
+  }, []);
+
+  // Save balance to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('horseRaceBalance', balance.toString());
+  }, [balance]);
 
   // Start the race
   const startRace = () => {
     if (selectedHorse === null) return;
     
+    // Deduct bet amount from balance
+    setBalance(prevBalance => prevBalance - betAmount);
+    
     setGameState('game');
     setHorses([0, 0, 0, 0, 0, 0]);
     setWinnerHorse(null);
+    setWinnings(null);
     
     // Clear any existing interval
     if (raceInterval) {
@@ -54,6 +77,13 @@ function App() {
             setWinnerHorse(i);
             setGameState('winner');
             clearInterval(interval);
+            
+            // Calculate winnings if the player's horse won (1/5 odds)
+            if (i === selectedHorse) {
+              const winAmount = betAmount * 6; // 5x profit + original bet
+              setWinnings(winAmount);
+              setBalance(prevBalance => prevBalance + winAmount);
+            }
           }
         }
         
@@ -93,6 +123,18 @@ function App() {
     setSelectedHorse(null);
   };
 
+  // Reset balance to 100
+  const resetBalance = () => {
+    setBalance(100);
+  };
+
+  // Change bet amount
+  const changeBetAmount = (amount: number) => {
+    if (amount <= balance) {
+      setBetAmount(amount);
+    }
+  };
+
   // Render different screens based on game state
   const renderScreen = () => {
     switch (gameState) {
@@ -100,6 +142,10 @@ function App() {
         return (
           <div className="menu-screen">
             <h1>Horse Racing Game</h1>
+            <div className="balance-display">
+              <h2>Your Balance: {balance} coins</h2>
+              <button className="reset-button" onClick={resetBalance}>Reset Balance</button>
+            </div>
             <div className="horse-selection">
               <h2>Select your horse:</h2>
               <div className="horses-grid">
@@ -116,13 +162,32 @@ function App() {
                 ))}
               </div>
             </div>
+            <div className="betting-section">
+              <h3>Place your bet:</h3>
+              <div className="bet-amounts">
+                {BET_AMOUNTS.map(amount => (
+                  <button 
+                    key={amount}
+                    className={`bet-button ${betAmount === amount ? 'selected' : ''}`}
+                    onClick={() => changeBetAmount(amount)}
+                    disabled={amount > balance}
+                  >
+                    {amount} coins
+                  </button>
+                ))}
+              </div>
+              <p className="odds-info">Odds: 5 to 1 (Win 6x your bet)</p>
+            </div>
             <button 
               className="start-button" 
               onClick={startRace}
-              disabled={selectedHorse === null}
+              disabled={selectedHorse === null || balance < betAmount}
             >
               Start Race
             </button>
+            {balance < 10 && (
+              <p className="warning-message">Not enough coins to bet! Reset your balance.</p>
+            )}
           </div>
         );
       
@@ -144,7 +209,13 @@ function App() {
                 </div>
               ))}
             </div>
-            <button className="pause-button" onClick={pauseGame}>Pause</button>
+            <div className="game-info">
+              <div className="balance-display">
+                <span>Balance: {balance} coins</span>
+                <span>Bet: {betAmount} coins on Horse {selectedHorse !== null ? selectedHorse + 1 : ''}</span>
+              </div>
+              <button className="pause-button" onClick={pauseGame}>Pause</button>
+            </div>
           </div>
         );
       
@@ -153,6 +224,10 @@ function App() {
           <div className="pause-screen">
             <div className="pause-menu">
               <h2>Game Paused</h2>
+              <div className="balance-display">
+                <p>Balance: {balance} coins</p>
+                <p>Bet: {betAmount} coins on Horse {selectedHorse !== null ? selectedHorse + 1 : ''}</p>
+              </div>
               <button onClick={resumeGame}>Resume</button>
               <button onClick={returnToMenu}>Exit to Menu</button>
             </div>
@@ -185,11 +260,16 @@ function App() {
               </div>
             )}
             {selectedHorse !== null && winnerHorse !== null && (
-              <h3>
-                {selectedHorse === winnerHorse 
-                  ? 'Congratulations! Your horse won!' 
-                  : 'Better luck next time!'}
-              </h3>
+              <div className="result-message">
+                <h3>
+                  {selectedHorse === winnerHorse 
+                    ? `Congratulations! Your horse won! You won ${winnings} coins!` 
+                    : `Better luck next time! You lost ${betAmount} coins.`}
+                </h3>
+                <div className="balance-display">
+                  <h3>Your Balance: {balance} coins</h3>
+                </div>
+              </div>
             )}
             <button onClick={returnToMenu}>Return to Menu</button>
           </div>
