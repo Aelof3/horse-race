@@ -1,0 +1,21 @@
+{
+  "name": "Horse Racing Game",
+  "short_name": "Horse Race",
+  "description": "A fun horse racing game with betting. Select your horse, place your bet, and win coins!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#FFD700",
+  "icons": [
+    {
+      "src": "/horse.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/horse.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+} 
